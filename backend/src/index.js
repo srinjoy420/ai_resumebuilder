@@ -12,6 +12,11 @@ const PORT=process.env.PORT
 app.use(express.json())
 app.use(cookieparser())
 app.use(express.urlencoded({extended:true}))
+app.use(cors({
+    origin:"http://localhost:5173",
+    credentials:true,
+    methods:["GET","POST","PUT"]
+}))
 app.get("/",(req,res)=>{
     res.send("hello")
 })

@@ -3,7 +3,7 @@ import User from "../model/User.model.js";
 const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 24 * 60 * 60 * 1000
 };
 export const generateAccessandRefreshToken = async (userId) => {
@@ -57,26 +57,19 @@ export const LoginUser = async (req, res) => {
     }
     try {
         const user = await User.findOne({ email })
-        if (!user) {
-            return res.status(404).json({ message: "the user not found" })
-        }
-        const isPasswordMatch = await user.comparePassword(password)
-        if (!isPasswordMatch) {
-            return res.status(400).json({ message: "password not match" })
+        const passwordMatch = user && (await user.comparePassword(password))
+        if (!user || !passwordMatch) {
+            return res.status(401).json({ message: "Invalid email or password" })
         }
         const { accessToken, refreshToken } = await generateAccessandRefreshToken(user._id)
         const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
         res.cookie("refreshToken", refreshToken, cookieOptions)
         res.cookie("accessToken", accessToken, cookieOptions)
-        res.status(201).json({ message: "user loggedin successfully", user: loggedInUser })
-
-
-
-
+        return res.status(200).json({ message: "user logged in successfully", user: loggedInUser })
     }
     catch (error) {
         console.log("there was a problem in loggedin", error);
-        res.status(400).json({ message: " the user cant loggedin" })
+        return res.status(500).json({ message: "Unable to log in, please try again" })
     }
 }
 export const logOutUser = async (req, res) => {

@@ -1,11 +1,25 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {useNavigate,Link} from "react-router"
+import {Loader} from "lucide-react"
+import { useAuth } from '../hooks/useauth.js'
 
 const Register = () => {
+  const {loading,handleregister}=useAuth()
+  const [username, setusername] = useState("")
+  const [email, setemail] = useState("")
+  const [password, setpassword] = useState("")
+  const navigaate=useNavigate()
   const handelSubmit=(e)=>{
     e.preventDefault()
+    handleregister({username,email,password})
+    navigaate("/")
   }
-  const navigaate=useNavigate()
+  if(loading){
+    return (
+      <Loader/>
+    )
+  }
+  
   return (
     <main>
       <div className='form-container'>
@@ -13,19 +27,28 @@ const Register = () => {
         <form onSubmit={handelSubmit}>
           <div className='input-group'>
               <label htmlFor='username'>User Name</label>
-              <input type='text' name='username' id='username' placeholder='enter your naame'/>
+              <input 
+              value={username}
+              onChange={(e)=>{setusername(e.target.value)}}
+              type='text' name='username' id='username' placeholder='enter your naame'/>
               
 
           </div>
           <div className='input-group'>
               <label htmlFor='email'>Email</label>
-              <input type='email' name='email' id='email' placeholder='enter your email'/>
+              <input 
+              value={email}
+              onChange={(e)=>{setemail(e.target.value)}}
+              type='email' name='email' id='email' placeholder='enter your email'/>
               
 
           </div>
            <div className='input-group'>
               <label htmlFor='password'>password</label>
-              <input type='password' name='password' id='password' placeholder='enter your password'/>
+              <input 
+              value={password}
+              onChange={(e)=>setpassword(e.target.value)}
+              type='password' name='password' id='password' placeholder='enter your password'/>
               
 
           </div>

@@ -4,6 +4,12 @@ import cookieparser from "cookie-parser"
 import cors from "cors"
 import connectDB from "./DB/DB.js"
 import authRouter from "./routes/Auth.routes.js"
+import { jobDecsription,selfDescription,resume } from "./services/temp.js"
+import generateIntervieweReport from "./services/ai.service.js"
+
+// import invokeGwminiAI from "./services/ai.service.js"
+
+
 
 
 dotenv.config()
@@ -22,6 +28,8 @@ app.get("/",(req,res)=>{
 })
 app.use("/api/v1/auth",authRouter)
 connectDB()
+generateIntervieweReport(resume,selfDescription,jobDecsription)
+// invokeGwminiAI()
 app.listen(PORT,()=>{
     console.log("server is running on port",PORT);
     

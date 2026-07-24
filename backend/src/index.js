@@ -4,8 +4,11 @@ import cookieparser from "cookie-parser"
 import cors from "cors"
 import connectDB from "./DB/DB.js"
 import authRouter from "./routes/Auth.routes.js"
+import ineterViewRouter from "./routes/InterView.routes.js"
 import { jobDecsription,selfDescription,resume } from "./services/temp.js"
-import generateIntervieweReport from "./services/ai.service.js"
+import { generateIntervieweReport,generateResumePdf } from "./services/ai.service.js"
+
+
 
 // import invokeGwminiAI from "./services/ai.service.js"
 
@@ -27,8 +30,9 @@ app.get("/",(req,res)=>{
     res.send("hello")
 })
 app.use("/api/v1/auth",authRouter)
+app.use("/api/v1/interview",ineterViewRouter)
 connectDB()
-generateIntervieweReport(resume,selfDescription,jobDecsription)
+// generateIntervieweReport(resume,selfDescription,jobDecsription)
 // invokeGwminiAI()
 app.listen(PORT,()=>{
     console.log("server is running on port",PORT);

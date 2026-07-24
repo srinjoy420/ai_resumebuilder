@@ -80,12 +80,16 @@ const interViweReportSchema = new mongoose.Schema({
         max: 100
     },
     technicalQuestions: [
-        technicalQuestionInterview
+        technicalQuestionInterviewSchema
     ],
     bhavioralQuestions: [BehaberialQuestionSchema],
     skillGap:[skillGapsSchema],
-    preparationPlan:[preparaqtionPlanSchema]
+    preparationPlan:[preparaqtionPlanSchema],
+    user:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"USER"
+    }
 }, { timestamps: true })
 
-const interviweReportModel=mongoose.model("InterviewReport",interViweReportSchema)
-export default interviweReportModel
+const InterviweReportModel=mongoose.model("InterviewReport",interViweReportSchema)
+export default InterviweReportModel

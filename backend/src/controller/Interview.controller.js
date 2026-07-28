@@ -5,27 +5,29 @@ import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 
 const pdfParse = require("pdf-parse");
+// console.log(pdfParse);
+// console.log(typeof pdfParse);
 
 
 export const genertateInterviewReport=async(req,res)=>{
     try {
         const resumeFile=req.file
         if(!resumeFile){
-            return res.json(400).json({message:"Resume File Rrequired"})
+            return res.status(400).json({ message: "Resume File Required" })
         }
     // const parsePdf=await pdfParse(resumeFile.buffer)
-    const resumeContent=(new pdfParse.PDFParse(req.file.buffer)).getText()
+    const resumeContent=await(new pdfParse.PDFParse(Uint8Array.from(req.file.buffer))).getText()
     const {selfDescription,jobDecsription}=req.body
 
     const interVierReportByAI=await generateIntervieweReport({
-        resume:resumeContent,
+        resume:resumeContent.text,
         selfDescription,
         jobDecsription
     })
 
     const interViewReport=await InterviweReportModel.create({
         user:req.user._id,
-        resume:resumeContent,
+        resume:resumeContent.text,
         selfDescription,
         jobDecsription,
         ...interVierReportByAI
@@ -37,4 +39,8 @@ export const genertateInterviewReport=async(req,res)=>{
         
         
     }
+}
+
+export const getInterviewreportByid=async(req,res)=>{
+    
 }

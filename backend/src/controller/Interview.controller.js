@@ -19,20 +19,20 @@ export const genertateInterviewReport=async(req,res)=>{
     const resumeContent=await(new pdfParse.PDFParse(Uint8Array.from(req.file.buffer))).getText()
     const {selfDescription,jobDecsription}=req.body
 
-    const interVierReportByAI=await generateIntervieweReport({
-        resume:resumeContent.text,
+    const interVierReportByAI = await generateIntervieweReport({
+        resume: resumeContent.text,
         selfDescription,
         jobDecsription
     })
 
-    const interViewReport=await InterviweReportModel.create({
-        user:req.user._id,
-        resume:resumeContent.text,
+    const interViewReport = await InterviweReportModel.create({
+        user: req.user._id,
+        resume: resumeContent.text,
         selfDescription,
         jobDecsription,
         ...interVierReportByAI
     })
-    res.status(201).json({message:"interview Report Generated Succesfully",interViewReport})
+    res.status(201).json({ message: "interview Report Generated Succesfully", report: interViewReport })
     } catch (error) {
         console.log("there is a problem in generating the report",error);
         res.status(500).json({message:"interview report generation failed"})
@@ -42,5 +42,26 @@ export const genertateInterviewReport=async(req,res)=>{
 }
 
 export const getInterviewreportByid=async(req,res)=>{
-    
+    const {interviewId}=req.params
+    try{
+        if(!interviewId){
+            return res.status(404).json({message:"interview report id is required"})
+        }
+        const interViewReport = await InterviweReportModel.findById(interviewId)
+        res.status(200).json({ message: "interview report fetched successfully", report: interViewReport })
+    }
+    catch(error){
+        console.log("there is a problem in fetching the report",error);
+        res.status(500).json({message:"interview report fetching failed"})
+    }
+}
+export const getAllInterviewReports=async(req,res)=>{
+    try{
+        const interViewreports = await InterviweReportModel.find({ user: req.user._id }).select("-resume -selfDescription -jobDecsription -__v -createdAt -updatedAt -technicalQuestions -behavioralQuestions -skillGap -preparationPlan -matchScore")
+        res.status(200).json({ message: "interview reports fetched successfully", reports: interViewreports })
+    }
+    catch(error){
+        console.log("there is a problem in fetching the reports",error);
+        res.status(500).json({message:"interview reports fetching failed"})
+    }
 }

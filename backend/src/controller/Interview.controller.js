@@ -47,8 +47,8 @@ export const getInterviewreportByid=async(req,res)=>{
         if(!interviewId){
             return res.status(404).json({message:"interview report id is required"})
         }
-        const interViewReport = await InterviweReportModel.findById(interviewId)
-        res.status(200).json({ message: "interview report fetched successfully", report: interViewReport })
+        const report = await InterviweReportModel.findById(interviewId)
+        res.status(200).json({ message: "interview report fetched successfully", report })
     }
     catch(error){
         console.log("there is a problem in fetching the report",error);
@@ -57,8 +57,8 @@ export const getInterviewreportByid=async(req,res)=>{
 }
 export const getAllInterviewReports=async(req,res)=>{
     try{
-        const interViewreports = await InterviweReportModel.find({ user: req.user._id }).select("-resume -selfDescription -jobDecsription -__v -createdAt -updatedAt -technicalQuestions -behavioralQuestions -skillGap -preparationPlan -matchScore")
-        res.status(200).json({ message: "interview reports fetched successfully", reports: interViewreports })
+        const reports = await InterviweReportModel.find({ user: req.user._id }).select("-resume -selfDescription -__v -createdAt -updatedAt -technicalQuestions -behavioralQuestions -skillGap -preparationPlan -matchScore")
+        res.status(200).json({ message: "interview reports fetched successfully", reports })
     }
     catch(error){
         console.log("there is a problem in fetching the reports",error);

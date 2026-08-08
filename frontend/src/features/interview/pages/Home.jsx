@@ -2,17 +2,20 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../style/home.scss'
 import { useInterview } from '../hooks/useInterview'
+import { useAuth } from '../../auth/hooks/useauth'
+
 
 const Home = () => {
     const [jobDescription, setJobDescription] = useState('')
     const [selfDescription, setSelfDescription] = useState('')
     const [resumeFile, setResumeFile] = useState(null)
+     const [showAllReports, setShowAllReports] = useState(false)
     const [error, setError] = useState('')
     const fileInputRef = useRef(null)
     const navigate = useNavigate()
 
     const { reports, loading, handleGenerateReport, fetchAllReports } = useInterview()
-
+    const  {handleLogout}=useAuth()
     useEffect(() => {
         fetchAllReports().catch(console.error)
     }, [])
@@ -45,9 +48,33 @@ const Home = () => {
             setError('Unable to generate interview report. Please try again.')
         }
     }
+    const handleLogoutClick=async()=>{
+        try{
+            await handleLogout()
+            navigate("/login")
+        }
+        catch(error){
+            console.log("error logging out",error)
+        }
+    }
 
     return (
         <main className='home'>
+            <div className='top-bar'>
+                   <button
+                    className='button secondary-button'
+                    type='button'
+                    onClick={() => navigate('/reports')}
+                >
+                    See all reports
+                </button>
+                 <button className='button logout-button' type='button'
+                 onClick={handleLogoutClick}
+                 >
+                    Logout
+                 </button>
+
+            </div>
             <section className='interview-shell'>
                 <div className='hero'>
                     <p className='eyebrow'>AI Interview Coach</p>

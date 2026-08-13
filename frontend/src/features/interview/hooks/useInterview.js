@@ -1,7 +1,7 @@
 import { InterviewContext } from "../style/interview.context";
 import { useContext, useEffect } from 'react'
 import { useParams } from 'react-router'
-import { genertateInterviewReport, getAllInterviewReports, getInterviewReportById } from "../services/interview.api.js";
+import { genertateInterviewReport, getAllInterviewReports, getInterviewReportById,generateResumePdf } from "../services/interview.api.js";
 
 export const useInterview = () => {
     const context = useContext(InterviewContext)
@@ -65,6 +65,23 @@ export const useInterview = () => {
         }
         return data?.reports
     }
+    const geenerateResumePdf = async (interviewReportId) => {
+    setLoading(true);
+
+    try {
+        if (!interviewReportId) {
+            throw new Error("interviewReportId is required");
+        }
+
+        await generateResumePdfApi(interviewReportId);
+
+    } catch (error) {
+        console.error("Failed to generate resume PDF:", error);
+        throw error;
+    } finally {
+        setLoading(false);
+    }
+};
 
     return {
         report,
@@ -72,7 +89,8 @@ export const useInterview = () => {
         reports,
         handleGenerateReport,
         generateReport,
-        fetchAllReports
+        fetchAllReports,
+        geenerateResumePdf
     }
 }
 

@@ -41,3 +41,33 @@ export async function getAllInterviewReports() {
         throw error
     }
 }
+export async function generateResumePdf(interviewReportId) {
+    try {
+        const res = await axios.post(
+            `${API_BASE}/resume/pdf/${interviewReportId}`,
+            {},
+            {
+                responseType: "blob",
+            }
+        );
+
+        const blob = new Blob([res.data], {
+            type: "application/pdf",
+        });
+
+        const url = window.URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `resume_${interviewReportId}.pdf`;
+
+        document.body.appendChild(link);
+        link.click();
+
+        link.remove();
+        window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+        console.error("Resume PDF generation failed:", error);
+    }
+}

@@ -1,6 +1,6 @@
 import InterviweReportModel from "../model/interviewreport.model.js";
 
-import { generateIntervieweReport } from "../services/ai.service.js";
+import { generateIntervieweReport,generateResumePdf } from "../services/ai.service.js";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 
@@ -64,4 +64,28 @@ export const getAllInterviewReports=async(req,res)=>{
         console.log("there is a problem in fetching the reports",error);
         res.status(500).json({message:"interview reports fetching failed"})
     }
+}
+
+export const generatResumeePdf=async(req,res)=>{
+    try {
+        const {interviewReportId}=req.params
+        if(!interviewReportId){
+            return res.status(404).json({message:"interviewreport id is required"})
+        }
+        const interviewReport=await InterviweReportModel.findById(interviewReportId)
+        if (!interviewReport) {
+    return res.status(404).json({message: "interview report not found"})
+}
+        const{resume,jobDecsription,selfDescription}=interviewReport
+        const pdfBuffer=await generateResumePdf({resume,selfDescription,jobDecsription})
+        res.set({
+    "Content-Type": "application/pdf",
+    "Content-Disposition": `attachment; filename="resume_${interviewReportId}.pdf"`
+})
+        res.send(pdfBuffer)
+    } catch (error) {
+        console.log("the pdf generation error",error);
+        res.status(500).json({message:"Internal server error the pdf generation Problem"})
+    }
+
 }

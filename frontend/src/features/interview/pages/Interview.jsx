@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom'
 import '../style/interview.scss'
 import { useInterview } from '../hooks/useInterview'
 
+
+
 const NAV_ITEMS = [
   { id: 'technical', label: 'Technical Questions' },
   { id: 'behavioral', label: 'Behavioral Questions' },

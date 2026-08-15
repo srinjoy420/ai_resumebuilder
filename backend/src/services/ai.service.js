@@ -11,6 +11,8 @@ const ai = new GoogleGenAI({
 })
 
 async function invokeGwminiAI() {
+
+
     const res = await ai.models.generateContent({
         model: "gemini-3.5-flash",
         contents: "Hello gemini| explain what is interview"
@@ -28,22 +30,21 @@ const interviewReportSchema = {
         },
         technicalQuestions: {
             type: "array",
-            description: "A list of 3-5 technical interview questions tailored to the job description, testing skills the role requires",
+            description: "Exactly 3 technical interview questions.",
             items: {
                 type: "object",
-                description: "A single technical question paired with why it's being asked and a strong sample answer",
                 properties: {
                     question: {
                         type: "string",
-                        description: "A technical interview question relevant to the job description"
+                        description: "The technical interview question."
                     },
                     intension: {
                         type: "string",
-                        description: "Why this question is being asked — what skill or knowledge it tests"
+                        description: "Explain what the interviewer is testing in 1-2 sentences."
                     },
                     answer: {
                         type: "string",
-                        description: "How to answer this question, what points to cover, what approach to take etc"
+                        description: "Give a concise interview-ready answer in 3-5 sentences."
                     }
                 },
                 required: ["question", "intension", "answer"]
@@ -51,22 +52,21 @@ const interviewReportSchema = {
         },
         behavioralQuestions: {
             type: "array",
-            description: "A list of 2-3 behavioral interview questions assessing soft skills, past experience, and how the candidate handles real work situations",
+            description: "Exactly 2 behavioral interview questions.",
             items: {
                 type: "object",
-                description: "A single behavioral question paired with why it's being asked and a strong sample answer",
                 properties: {
                     question: {
                         type: "string",
-                        description: "A behavioral interview question, typically starting with 'Tell me about a time...' or similar"
+                        description: "The behavioral interview question."
                     },
                     intension: {
                         type: "string",
-                        description: "What trait, skill, or experience this question is trying to uncover"
+                        description: "Explain what the interviewer is evaluating in 1-2 sentences."
                     },
                     answer: {
                         type: "string",
-                        description: "How to answer this question, what points to cover, what approach to take etc"
+                        description: "Give a concise interview-ready answer in 3-5 sentences."
                     }
                 },
                 required: ["question", "intension", "answer"]
@@ -74,19 +74,18 @@ const interviewReportSchema = {
         },
         skillGap: {
             type: "array",
-            description: "A list of skills the job description requires that are missing or weak in the candidate's resume, each rated by how critical the gap is",
+            description: "Maximum 5 of the most important skill gaps.",
             items: {
                 type: "object",
-                description: "A single missing or weak skill with a severity rating",
                 properties: {
                     skill: {
                         type: "string",
-                        description: "The name of the skill that is missing or underrepresented in the resume relative to the job description"
+                        description: "The missing or weak skill."
                     },
                     sevarity: {
                         type: "string",
                         enum: ["low", "medium", "hard"],
-                        description: "How critical this skill gap is for the role — low if minor/nice-to-have, hard if it's a core requirement the candidate lacks"
+                        description: "Severity of the skill gap."
                     }
                 },
                 required: ["skill", "sevarity"]
@@ -94,25 +93,23 @@ const interviewReportSchema = {
         },
         preparationPlan: {
             type: "array",
-            description: "A day-by-day study plan (3-5 days) to help the candidate prepare for the interview, prioritizing the identified skill gaps",
+            description: "Exactly 3 days of concise interview preparation.",
             items: {
                 type: "object",
-                description: "A single day's focus area and the specific tasks to complete that day",
                 properties: {
                     day: {
-                        type: "integer",
-                        description: "The day number in the preparation plan, starting at 1"
+                        type: "number",
+                        description: "Preparation day number."
                     },
                     focus: {
                         type: "string",
-                        description: "The main topic or skill area to focus on for this day"
+                        description: "Main focus for the day."
                     },
                     tasks: {
                         type: "array",
-                        description: "A list of specific, actionable tasks to complete on this day to build toward the day's focus area",
+                        description: "3-4 practical tasks for the day.",
                         items: {
-                            type: "string",
-                            description: "A single actionable preparation task"
+                            type: "string"
                         }
                     }
                 },
@@ -124,40 +121,55 @@ const interviewReportSchema = {
 };
 async function generateIntervieweReport({ resume, selfDescription, jobDecsription }) {
     const prompt = `
-You are an expert technical interviewer and career coach.
- 
-Given the candidate's resume, self description, and the job description below,
-generate a full interview preparation report.
- 
-Job Description:
+Analyze the candidate against the job description.
+
+JOB DESCRIPTION:
 ${jobDecsription}
- 
-Resume:
+
+RESUME:
 ${resume}
- 
-Candidate Self Description:
+
+SELF DESCRIPTION:
 ${selfDescription}
- 
-Generate:
-- A matchScore (0-100) for how well the resume fits the job description
-- 3-5 technical interview questions relevant to the role, each with the intention behind asking it and a strong sample answer
-- 2-3 behavioral interview questions, same structure
-- A list of skill gaps between the resume and job description, with a severity rating
-- A day-by-day preparation plan (3-5 days) with a focus area and specific tasks per day
+
+Create a concise interview preparation report.
+
+Requirements:
+- Match score from 0-100.
+- Exactly 3 technical interview questions.
+- Exactly 2 behavioral interview questions.
+- Identify the most important skill gaps.
+- Create a practical 3-day preparation plan.
+- Keep explanations concise.
+- Keep interview answers to 3-5 sentences.
+- Base the analysis only on the provided information.
 `;
+    // for test
+    console.log("Resume:", resume);
+    console.log("Job Description:", jobDecsription);
+    console.log("Self Description:", selfDescription);
+    console.log("Resume characters:", resume?.length || 0);
+    console.log("Job description characters:", jobDecsription?.length || 0);
+    console.log("Self description characters:", selfDescription?.length || 0);
+    console.time("Gemini Interview Report");
+    const res = await ai.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: prompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: interviewReportSchema
+        }
+    })
+    // for test
+    console.log(
+    "Gemini response characters:",
+    res.text?.length || 0
+);
+    console.timeEnd("Gemini Interview Report");
+    const JsonContent = JSON.parse(res.text)
+    console.log(JsonContent);
 
-const res=await ai.models.generateContent({
-    model:"gemini-3.5-flash",
-    contents:prompt,
-    config:{
-        responseMimeType:"application/json",
-        responseSchema:interviewReportSchema
-    }
-})
-const JsonContent=JSON.parse(res.text)
-console.log(JsonContent);
-
-return JsonContent
+    return JsonContent
 
 }
 // for pdf format
@@ -209,7 +221,7 @@ function parseGeminiJsonResponse(response) {
     return JSON.parse(cleanedText);
 }
 
-async function generateResumePdf({resume, selfDescription, jobDecsription}) {
+async function generateResumePdf({ resume, selfDescription, jobDecsription }) {
     const resumePdfSchema = {
         type: "object",
         description: "The generated resume as a single HTML document",
@@ -255,4 +267,4 @@ async function generateResumePdf({resume, selfDescription, jobDecsription}) {
     return pdfBuffer;
 }
 // export default invokeGwminiAI
-export  {generateIntervieweReport,generateResumePdf}
+export { generateIntervieweReport, generateResumePdf }

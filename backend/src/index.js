@@ -5,8 +5,6 @@ import cors from "cors"
 import connectDB from "./DB/DB.js"
 import authRouter from "./routes/Auth.routes.js"
 import ineterViewRouter from "./routes/InterView.routes.js"
-import { jobDecsription,selfDescription,resume } from "./services/temp.js"
-import { generateIntervieweReport,generateResumePdf } from "./services/ai.service.js"
 
 
 

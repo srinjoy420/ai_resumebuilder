@@ -1,7 +1,7 @@
 import {Router} from "express"
 import { isLoggedIn } from "../middleware/auth.middleware.js"
 import { upload } from "../middleware/file.middleware.js"
-import { genertateInterviewReport,getInterviewreportByid,getAllInterviewReports,generatResumeePdf } from "../controller/Interview.controller.js"
+import { genertateInterviewReport,getInterviewreportByid,getAllInterviewReports,generatResumeePdf,deleteInterviewReport } from "../controller/Interview.controller.js"
 
 
 
@@ -11,6 +11,8 @@ ineterViewRouter.post("/", isLoggedIn, upload, genertateInterviewReport)
 ineterViewRouter.get("/", isLoggedIn, getAllInterviewReports)
 ineterViewRouter.get("/:interviewId", isLoggedIn, getInterviewreportByid)
 ineterViewRouter.post("/resume/pdf/:interviewReportId",isLoggedIn,generatResumeePdf)
+ineterViewRouter.delete("/resume/delete/:interviewId",isLoggedIn,deleteInterviewReport)
+
 
 
 

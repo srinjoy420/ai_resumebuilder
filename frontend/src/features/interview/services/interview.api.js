@@ -50,6 +50,18 @@ export async function getAllInterviewReports() {
         throw error;
     }
 }
+export async function deleteInterviewReport(interviewId) {
+    try {
+        const res=await axios.delete(`${API_BASE}/resume/delete/${interviewId}`, {
+            withCredentials: true,
+        });
+        return res.data
+    } catch (error) {
+         console.error("Error delete interview report by ID:", error);
+        throw error;
+    }
+    
+}
 
 export async function generateResumePdf(interviewReportId) {
     try {

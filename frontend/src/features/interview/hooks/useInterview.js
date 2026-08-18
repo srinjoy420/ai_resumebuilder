@@ -7,6 +7,7 @@ import {
     getAllInterviewReports,
     getInterviewReportById,
     generateResumePdf as generateResumePdfApi,
+    deleteInterviewReport
 } from "../services/interview.api.js";
 
 export const useInterview = () => {
@@ -89,6 +90,19 @@ export const useInterview = () => {
 
         return data?.report;
     };
+    // handle delete report
+    const handelDeleteReport=async(interviewId)=>{
+        try {
+            await deleteInterviewReport(interviewId)
+            setReports((prev) => (prev || []).filter((item) => item._id !== interviewId))
+            if (report?._id === interviewId) {
+                setReport(null)
+            }
+        } catch (error) {
+            console.log(error)
+            throw error
+        }
+    }
 
     // -----------------------------------------
     // Get All Interview Reports
@@ -142,5 +156,6 @@ export const useInterview = () => {
         generateReport,
         fetchAllReports,
         generateResumePdf,
+        handelDeleteReport
     };
 };

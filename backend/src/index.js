@@ -20,10 +20,15 @@ app.use(express.json())
 app.use(cookieparser())
 app.use(express.urlencoded({extended:true}))
 app.use(cors({
-    origin:"http://localhost:5173",
-    credentials:true,
-    methods:["GET","POST","PUT"]
+    origin: "http://localhost:5173",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    optionsSuccessStatus: 204,
 }))
+
+app.options(/^(.*)$/, cors())
+
 app.get("/",(req,res)=>{
     res.send("hello")
 })

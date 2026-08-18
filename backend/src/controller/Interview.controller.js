@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import InterviweReportModel from "../model/interviewreport.model.js";
 
 import { generateIntervieweReport,generateResumePdf } from "../services/ai.service.js";
@@ -88,4 +89,23 @@ export const generatResumeePdf=async(req,res)=>{
         res.status(500).json({message:"Internal server error the pdf generation Problem"})
     }
 
+}
+export const deleteInterviewReport=async(req,res)=>{
+    try {
+        const {interviewId}=req.params
+        if(!interviewId){
+            return res.status(404).json({message:"interview report id is required"})
+        }
+        if(!mongoose.Types.ObjectId.isValid(interviewId)){
+            return res.status(404).json({message:"please provide the valid interview id"})
+        }
+        const deleteReport=await InterviweReportModel.findOneAndDelete({_id:interviewId,user:req.user._id})
+        if(!deleteReport){
+            return res.status(404).json({message:"cant find the deleteReport"})
+        }
+        res.status(200).json({message:"interview Report delete succesfully"})
+    } catch (error) {
+        console.log("there is a problem in deleting the report", error);
+        res.status(500).json({ message: "interview report deletion failed" })
+    }
 }

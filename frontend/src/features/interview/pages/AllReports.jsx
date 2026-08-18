@@ -2,15 +2,35 @@ import React, { useEffect } from 'react'
 import '../style/home.scss'
 import { useInterview } from '../hooks/useInterview'
 import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 
 
 const AllReports = () => {
-    const { reports, loading, fetchAllReports } = useInterview()
+    const { reports, loading, fetchAllReports, handelDeleteReport } = useInterview()
+    const [deletingId, setDeletingID] = useState(null)
     const navigate = useNavigate()
 
     useEffect(() => {
         fetchAllReports().catch(console.error)
     }, [])
+    const deleteOneReport = async (event, reportId) => {
+        event.stopPropagation()
+        const confirmed = window.confirm("Deleting this report are you sure?this can't be undone")
+        if (!confirmed) {
+            return
+        }
+        try {
+            setDeletingID(reportId)
+            await handelDeleteReport(reportId)
+        } catch (error) {
+            console.error(error)
+
+        }
+        finally {
+            setDeletingID(null)
+        }
+
+    }
 
     return (
         <main className='home'>
@@ -41,15 +61,28 @@ const AllReports = () => {
                     {!loading && reports?.length > 0 && (
                         <div className='reports-grid'>
                             {reports.map((item) => (
-                                <button
-                                    key={item._id}
-                                    className='report-card'
+                                <div key={item._id} className='report-card-wrapper'>
+                                    <button
+
+                                        className='report-card'
+                                        type='button'
+                                        onClick={() => navigate(`/interview/${item._id}`)}
+                                    >
+                                        <p>{item.jobDecsription?.slice(0, 120) || 'Untitled job description'}</p>
+                                        <span>View report</span>
+                                    </button>
+                                    <button
                                     type='button'
-                                    onClick={() => navigate(`/interview/${item._id}`)}
-                                >
-                                    <p>{item.jobDecsription?.slice(0, 120) || 'Untitled job description'}</p>
-                                    <span>View report</span>
-                                </button>
+                                     className='delete-report-button'
+                                     onClick={(event)=>deleteOneReport(event,item._id)}
+                                     disabled={deletingId===item._id}
+                                     aria-label='Delete report'
+                                    >
+                                         {deletingId === item._id ? '…' : '✕'}
+                                    </button>
+                                </div>
+
+
                             ))}
                         </div>
                     )}

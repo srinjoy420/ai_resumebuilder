@@ -1,6 +1,6 @@
 import axios from "axios"
 
-const API_BASE = "http://localhost:3000/api/v1/auth"
+const API_BASE = "https://ai-resumebuilder-eicy.onrender.com/api/v1/auth"
 
 export async function register({username, email, password}) {
     try {

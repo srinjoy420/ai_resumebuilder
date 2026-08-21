@@ -145,13 +145,13 @@ Requirements:
 - Base the analysis only on the provided information.
 `;
     // for test
-    console.log("Resume:", resume);
-    console.log("Job Description:", jobDecsription);
-    console.log("Self Description:", selfDescription);
-    console.log("Resume characters:", resume?.length || 0);
-    console.log("Job description characters:", jobDecsription?.length || 0);
-    console.log("Self description characters:", selfDescription?.length || 0);
-    console.time("Gemini Interview Report");
+    // console.log("Resume:", resume);
+    // console.log("Job Description:", jobDecsription);
+    // console.log("Self Description:", selfDescription);
+    // console.log("Resume characters:", resume?.length || 0);
+    // console.log("Job description characters:", jobDecsription?.length || 0);
+    // console.log("Self description characters:", selfDescription?.length || 0);
+    // console.time("Gemini Interview Report");
     const res = await ai.models.generateContent({
         model: "gemini-3.5-flash",
         contents: prompt,
@@ -161,11 +161,11 @@ Requirements:
         }
     })
     // for test
-    console.log(
-    "Gemini response characters:",
-    res.text?.length || 0
-);
-    console.timeEnd("Gemini Interview Report");
+//     console.log(
+//     "Gemini response characters:",
+//     res.text?.length || 0
+// );
+    // console.timeEnd("Gemini Interview Report");
     const JsonContent = JSON.parse(res.text)
     console.log(JsonContent);
 
@@ -183,7 +183,7 @@ async function generatePdfFormatHtml(htmlContent) {
 
         const page = await browser.newPage();
         await page.setContent(htmlContent, { waitUntil: "networkidle0" });
-
+        console.time("PDF Generation");
         const pdfBuffer = await page.pdf({
             format: "A4",
             margin: {
@@ -193,6 +193,7 @@ async function generatePdfFormatHtml(htmlContent) {
                 right: "15mm"
             }
         });
+        console.timeEnd("PDF Generation");
 
         return pdfBuffer;
     } finally {

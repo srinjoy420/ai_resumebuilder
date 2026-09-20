@@ -45,7 +45,10 @@ const Home = () => {
             }
         } catch (submitError) {
             console.error(submitError)
-            setError('Unable to generate interview report. Please try again.')
+            setError(
+                submitError.response?.data?.message ||
+                'Unable to generate interview report. Please try again.'
+            )
         }
     }
     const handleLogoutClick=async()=>{

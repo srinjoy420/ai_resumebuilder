@@ -20,7 +20,10 @@ export async function genertateInterviewReport({
 
         return res.data;
     } catch (error) {
-        console.error("Error generating interview report:", error);
+        console.error(
+            "Error generating interview report:",
+            error.response?.data || error.message
+        );
         throw error;
     }
 }

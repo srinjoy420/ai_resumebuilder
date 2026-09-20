@@ -25,15 +25,14 @@ app.use(cors({
             "http://localhost:5173",
             "https://ai-resumebuilder-six.vercel.app",
         ]
-        callback(null, !origin || allowedOrigins.includes(origin))
+        const isVercelPreview = /^https:\/\/ai-resumebuilder(?:-.*)?\.vercel\.app$/.test(origin || "")
+        callback(null, !origin || allowedOrigins.includes(origin) || isVercelPreview)
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     optionsSuccessStatus: 204,
 }))
-
-app.options(/^(.*)$/, cors())
 
 app.get("/",(req,res)=>{
     res.send("hello")

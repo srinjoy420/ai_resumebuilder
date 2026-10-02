@@ -10,14 +10,12 @@ const ai = new GoogleGenAI({
 // ✅ Fallback model list
 const MODELS = [
     "gemini-3.8-flash",
-    "gemini-3.8-flash-lite",
-    "gemini-2.5-flash",
-    "gemini-2.5-flash-lite",
-   
+    "gemini-3.5-flash-lite",
 ]
 
 // ✅ Retry + Fallback
 async function generateWithRetry(prompt, schema, retries = 3, delayMs = 2000) {
+    let lastError
     for (const model of MODELS) {
         let currentDelay = delayMs
         for (let attempt = 1; attempt <= retries; attempt++) {
@@ -34,13 +32,14 @@ async function generateWithRetry(prompt, schema, retries = 3, delayMs = 2000) {
                 console.log(`✅ Success with model: ${model}`)
                 return res
             } catch (error) {
+                lastError = error
                 const isOverloaded = error.status === 503
                 const isRateLimit = error.status === 429
                 const isNotFound = error.status === 404
                 const isLastAttempt = attempt === retries
 
                 if (isNotFound) {
-                    console.log(`❌ ${model} not found/deprecated, trying next model...`)
+                    console.log(`❌ ${model} is unavailable (${error.message}), trying next model...`)
                     break // exit retry loop → go to next model
                 }
 
@@ -49,7 +48,7 @@ async function generateWithRetry(prompt, schema, retries = 3, delayMs = 2000) {
                     await new Promise(resolve => setTimeout(resolve, currentDelay))
                     currentDelay *= 2 // 2s → 4s → 8s
                 } else if (isLastAttempt) {
-                    console.log(`❌ All retries failed for ${model}, trying next model...`)
+                    console.log(`❌ All retries failed for ${model} (${error.message}), trying next model...`)
                     break // exit retry loop → go to next model
                 } else {
                     throw error // unknown error → throw immediately
@@ -57,7 +56,7 @@ async function generateWithRetry(prompt, schema, retries = 3, delayMs = 2000) {
             }
         }
     }
-    throw new Error("All Gemini models are unavailable. Please try again later.")
+    throw new Error(`Gemini report generation failed for all configured models. Last error: ${lastError?.message ?? "Unknown error"}`, { cause: lastError })
 }
 
 const interviewReportSchema = {
@@ -194,9 +193,14 @@ Requirements:
 async function generatePdfFormatHtml(htmlContent) {
     let browser
     try {
+        const executablePath = process.env.NODE_ENV === "production" && process.env.PUPPETEER_EXECUTABLE_PATH
+            ? process.env.PUPPETEER_EXECUTABLE_PATH
+            : await puppeteer.executablePath()
         browser = await puppeteer.launch({
             headless: "new",
-            args: ["--no-sandbox", "--disable-setuid-sandbox"]
+            args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage",  // ✅ add
+                "--disable-gpu" ],
+            executablePath
         })
         const page = await browser.newPage()
         await page.setContent(htmlContent, { waitUntil: "networkidle0" })

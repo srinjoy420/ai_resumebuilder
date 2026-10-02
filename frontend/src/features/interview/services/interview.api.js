@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_URL + "/interview" || "http://localhost:3000/api/v1/interview";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
+const API_BASE = `${API_BASE_URL.replace(/\/+$/, "")}/interview`;
 
 export async function genertateInterviewReport({
     resumeFile,

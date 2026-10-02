@@ -237,14 +237,21 @@ Create a `.env` file inside the backend directory.
 ```env
 PORT=3000
 
-MONGODB_URI=your_mongodb_connection_string
+MONGO_URI=your_mongodb_connection_string
 
 GOOGLE_GEMINI_API_KEY=your_gemini_api_key
 
-JWT_SECRET=your_jwt_secret
+ACESS_TOKEN_SECRET=your_access_token_secret
+ACCESS_TOKEN_EXPIRY=15m
+REFRESH_TOKEN_SECRET=your_refresh_token_secret
+REFRESH_TOKEN_EXPIRY=7d
+FRONTEND_URL=http://localhost:5173
+NODE_ENV=development
 ```
 
 Do not commit your `.env` file to GitHub.
+
+For Vercel, set `VITE_API_URL` to the backend URL ending in `/api/v1`, for example `https://your-backend.onrender.com/api/v1`. This URL is public and is not a secret. On Render, set `FRONTEND_URL` to the deployed Vercel origin, for example `https://your-app.vercel.app`.
 
 Add:
 

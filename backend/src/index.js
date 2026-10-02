@@ -21,12 +21,14 @@ app.use(cookieparser())
 app.use(express.urlencoded({extended:true}))
 app.use(cors({
     origin: (origin, callback) => {
-        const allowedOrigins = [
-            "http://localhost:5173",
-            "https://ai-resumebuilder-six.vercel.app",
-        ]
-        const isVercelPreview = /^https:\/\/ai-resumebuilder(?:-.*)?\.vercel\.app$/.test(origin || "")
-        callback(null, !origin || allowedOrigins.includes(origin) || isVercelPreview)
+        const allowedOrigins = ["http://localhost:5173"]
+
+        // Allow requests with no origin (Thunder Client, Postman, curl, server-to-server)
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true)
+        } else {
+            callback(new Error("Not allowed by CORS"))
+        }
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],

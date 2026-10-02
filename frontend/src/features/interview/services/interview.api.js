@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE = "https://ai-resumebuilder-eicy.onrender.com/api/v1/interview";
+const API_BASE = import.meta.env.VITE_API_URL + "/interview" || "http://localhost:3000/api/v1/interview";
 
 export async function genertateInterviewReport({
     resumeFile,
